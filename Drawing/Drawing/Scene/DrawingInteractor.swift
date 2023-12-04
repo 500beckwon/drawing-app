@@ -17,6 +17,18 @@ protocol DrawingBusinessLogic {
     func serverFetch()
 }
 
+protocol DrawingActionLogic {
+    func makeRectangle(drawRect: DrawingRect)
+    func startDrawLine(drawPoint: DrawPoint)
+    func makeDrawingLine(drawPoint: DrawPoint)
+    func endDrawingLine()
+}
+
+protocol DrawingNetworkLogic {
+    func requestLogin(id: String)
+    func serverFetch()
+}
+
 protocol DrawingDataSource {
     var drawingResource: [DrawingInfo] { get set }
 }
