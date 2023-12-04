@@ -27,6 +27,7 @@ final class ViewController: UIViewController, DrawingDisplayLogic {
     private let syncButton = UIButton()
     private let stackView = UIStackView()
     private let loginView = LoginView()
+    private let editItemView = EditItemView()
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -156,6 +157,7 @@ private extension ViewController {
         [
             canvasView,
             stackView,
+            editItemView,
             loginView
         ].forEach {
             view.addSubview($0)
@@ -171,6 +173,7 @@ private extension ViewController {
         makeRectangleButtonBasicSet()
         makeDrawLineButtonBasicSet()
         syncButtonBasicSet()
+        editItemViewBasicSet()
         stackViewBasicSet()
     }
     
@@ -180,6 +183,7 @@ private extension ViewController {
         makeRectangleButtonAnchor()
         makeDrawLineButtonAnchor()
         syncButtonAnchor()
+        editItemViewAnchor()
         loginViewAnchor()
     }
     
@@ -198,6 +202,10 @@ private extension ViewController {
     func loginViewBasicSet() {
         loginView.translatesAutoresizingMaskIntoConstraints = false
         loginView.isHidden = true
+    }
+    
+    func editItemViewBasicSet() {
+        editItemView.translatesAutoresizingMaskIntoConstraints = false
     }
     
     func makeRectangleButtonBasicSet() {
@@ -276,6 +284,16 @@ private extension ViewController {
             [
                 syncButton.widthAnchor.constraint(equalToConstant: 100),
                 syncButton.heightAnchor.constraint(equalToConstant: 100)
+            ]
+        )
+    }
+    
+    func editItemViewAnchor() {
+        NSLayoutConstraint.activate(
+            [
+                editItemView.widthAnchor.constraint(equalToConstant: 50),
+                editItemView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50),
+                editItemView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
             ]
         )
     }
