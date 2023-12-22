@@ -5,13 +5,15 @@
 //  Created by ByungHoon Ann on 2023/11/13.
 //
 
+import Foundation
+
 protocol DrawingInformation {
     var id: String { get }
     var rect:  DrawingRect { get }
     var color: DrawingRGB { get }
     var drawingType: DrawingType { get }
-    var path: DrawingBezierPath? { get }
     var isMine: Bool { get }
+    var pathInfo: DrawingPathInfo? { get set }
 }
 
 struct DrawingInfo: DrawingInformation, Codable {
@@ -19,21 +21,21 @@ struct DrawingInfo: DrawingInformation, Codable {
     let rect: DrawingRect
     let color: DrawingRGB
     let drawingType: DrawingType
-    let path: DrawingBezierPath?
     let isMine: Bool
+    var pathInfo: DrawingPathInfo?
     
     init(id: String,
          rect: DrawingRect = .zero,
          color: DrawingRGB,
          drawingType: DrawingType,
-         path: DrawingBezierPath? = nil,
-         isMine: Bool = true) {
+         isMine: Bool = true,
+         pathInfo: DrawingPathInfo? = nil) {
         self.id = id
         self.rect = rect
         self.color = color
         self.drawingType = drawingType
-        self.path = path
         self.isMine = isMine
+        self.pathInfo = pathInfo
     }
 }
 
@@ -52,9 +54,11 @@ struct DrawingRect: Codable {
     }
 }
 
-struct DrawPoint{
+struct DrawPoint: Codable {
     let x: Float
     let y: Float
+    
+    static let zero = DrawPoint(x: 0, y: 0)
 }
 
 struct DrawingRGB: Codable {
@@ -65,6 +69,23 @@ struct DrawingRGB: Codable {
     
     static var clear: DrawingRGB {
         return DrawingRGB(red: 0, blue: 0, green: 0, alpha: 0)
+    }
+}
+
+struct DrawingPathInfo: Codable {
+    var startPoint: DrawPoint
+    var pathPoint: [DrawPoint]
+    var bounds: DrawingRect
+    let id: String
+    
+    init(id: String = UUID().uuidString,
+         bounds: DrawingRect = .zero,
+         startPoint: DrawPoint = .zero,
+         pathPoint: [DrawPoint] = []) {
+        self.id = id
+        self.bounds = bounds
+        self.startPoint = startPoint
+        self.pathPoint = pathPoint
     }
 }
 
