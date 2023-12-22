@@ -33,4 +33,14 @@ final class DrawedButton: UIButton {
         layer.borderColor = UIColor.systemRed.cgColor
         layer.borderWidth = 2
     }
+    
+    func drawingPathView(bezierPath: UIBezierPath, shapeLayer: CAShapeLayer) {
+        let rect = bezierPath.bounds
+        let transform = CGAffineTransform(translationX:  -rect.origin.x, y: -rect.origin.y)
+        bezierPath.apply(transform)
+        shapeLayer.path = bezierPath.cgPath
+
+        frame = rect
+        layer.addSublayer(shapeLayer)
+    }
 }

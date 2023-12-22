@@ -59,21 +59,22 @@ final class CanvasView: UIView {
     }
     
     func makeDrawingLineView(info: DrawingInformation) {
+        guard let pathInfo = info.pathInfo else { return }
         shapeLayers.forEach{ $0.removeFromSuperlayer() }
-        guard let path = info.path?.path else { return }
-        let rect = path.bounds
+        shapeLayers.removeAll()
+        
+        let path = makeBezierPath(pathInfo: pathInfo)
+        let shapeLayer = makeShapeLayer()
         let drawButton = DrawedButton(info: info)
         
-        let shapeLayer = makeShapeLayer()
-        path.apply(CGAffineTransform(translationX: -rect.origin.x, y: -rect.origin.y))
-        shapeLayer.path = path.cgPath
-        drawButton.layer.addSublayer(shapeLayer)
-        drawButton.frame = rect
+        drawButton.drawingPathView(bezierPath: path, shapeLayer: shapeLayer)
+        drawButton.addTarget(self, action: #selector(handleShapeTap), for: .touchUpInside)
         addSubview(drawButton)
     }
     
     func drawDrawing(drawingPath: DrawingInformation) {
-        guard let path = drawingPath.path?.path else{ return }
+        guard let pathInfo = drawingPath.pathInfo else { return }
+        let path = makeBezierPath(pathInfo: pathInfo)
         let shapeLayer = makeShapeLayer()
         shapeLayer.path = path.cgPath
         layer.addSublayer(shapeLayer)
@@ -92,6 +93,14 @@ final class CanvasView: UIView {
         shapeLayer.fillColor = UIColor.clear.cgColor
         shapeLayer.lineWidth = 5.0
         return shapeLayer
+    }
+    
+    func makeBezierPath(pathInfo: DrawingPathInfo) -> UIBezierPath {
+        let path = UIBezierPath()
+        path.accessibilityLabel = pathInfo.id
+        path.move(to: pathInfo.startPoint)
+        pathInfo.pathPoint.forEach { path.addLine(to: $0) }
+        return path
     }
 }
 
