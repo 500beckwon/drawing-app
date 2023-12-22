@@ -2,27 +2,45 @@
 //  BezierPathManager.swift
 //  Drawing
 //
-//  Created by ByungHoon Ann on 2023/11/15.
+//  Created by dev dfcc on 12/19/23.
 //
 
 import UIKit
 
-final class BezierPathManager {
-    static func archive(_ drawingBezierPath: UIBezierPathProtocol) -> Data? {
-        do {
-            let data = try NSKeyedArchiver.archivedData(withRootObject: drawingBezierPath, requiringSecureCoding: false)
-            return data
-        } catch {
-            return nil
-        }
+final class BezierPathManager: BezierPathProtocol {
+    private lazy var bezierPath = UIBezierPath()
+    private lazy var bezierPathInfo = DrawingPathInfo()
+    
+    var bounds: DrawingRect {
+        bezierPathInfo.bounds
     }
     
-    static func unarchive(from data: Data) -> UIBezierPathProtocol? {
-        do {
-            let path = try NSKeyedUnarchiver.unarchivedObject(ofClass: UIBezierPath.self, from: data)
-            return path
-        } catch {
-            return nil
-        }
+    var id: String {
+        bezierPathInfo.id
+    }
+    
+    var info: DrawingPathInfo {
+        return bezierPathInfo
+    }
+    
+    func move(to point: DrawPoint) {
+        bezierPath = UIBezierPath()
+        bezierPathInfo = DrawingPathInfo()
+        bezierPath.move(to: point)
+        bezierPathInfo.startPoint = point
+    }
+    
+    func addLine(to point: DrawPoint) {
+        bezierPath.addLine(to: point)
+        bezierPathInfo.pathPoint.append(point)
+        bezierPathInfo.bounds = bezierPath.bounds.convertDrawingRect()
+    }
+    
+    func makeDrawingInfo() -> DrawingInfo {
+        return DrawingInfo(id: id,
+                           rect: bounds,
+                           color: .clear,
+                           drawingType: .line,
+                           pathInfo: bezierPathInfo)
     }
 }

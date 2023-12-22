@@ -14,43 +14,12 @@ protocol DrawingUseCase {
     func endDraw() -> DrawingInfo
 }
 
-struct DrawingBezierPath: Codable {
-    let path: UIBezierPathProtocol
-    
-    init(path: UIBezierPathProtocol) {
-        self.path = path
-    }
-    
-    enum CodingKeys: String, CodingKey {
-        case bezierPathData
-    }
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        if let bezierPathData = try container.decodeIfPresent(Data.self, forKey: .bezierPathData) {
-            let path = BezierPathManager.unarchive(from: bezierPathData)
-            self.path = path ?? UIBezierPath()
-        } else {
-            self.path = UIBezierPath()
-        }
-    }
-    
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        let pathData = BezierPathManager.archive(path)
-        try container.encode(pathData, forKey: .bezierPathData)
-    }
-}
-
-class DrawingUseCaseImpl: DrawingUseCase {
+final class DrawingUseCaseImpl: DrawingUseCase {
     
     private let width: Float = 100
     private let height: Float = 100
-    private var drawingBezierPath: UIBezierPathProtocol = UIBezierPath()
     
-    func makeDrawingPath() -> DrawingBezierPath {
-        return DrawingBezierPath(path: drawingBezierPath)
-    }
+    private let fakeBezierPath = BezierPathManager()
     
     func makeRectangle(drawRect: DrawingRect) -> DrawingInfo {
         return DrawingInfo(id: makeDrawingID(),
@@ -58,26 +27,18 @@ class DrawingUseCaseImpl: DrawingUseCase {
                            color: makeRandomColor(),
                            drawingType: .rectangle)
     }
-    
+                      
     func startDraw(drawPoint: DrawPoint) {
-        drawingBezierPath = UIBezierPath()
-        drawingBezierPath.accessibilityLabel = makeDrawingID()
-        drawingBezierPath.move(to: drawPoint)
+        fakeBezierPath.move(to: drawPoint)
     }
     
     func makingDraw(drawPoint: DrawPoint) -> DrawingInfo {
-        drawingBezierPath.addLine(to: drawPoint)
-        return DrawingInfo(id: drawingBezierPath.accessibilityLabel ?? "",
-                           color: .clear,
-                           drawingType: .line,
-                           path: makeDrawingPath())
+        fakeBezierPath.addLine(to: drawPoint)
+        return fakeBezierPath.makeDrawingInfo()
     }
     
     func endDraw() -> DrawingInfo {
-        return DrawingInfo(id: drawingBezierPath.accessibilityLabel ?? "",
-                           color: .clear,
-                           drawingType: .line,
-                           path: makeDrawingPath())
+        return fakeBezierPath.makeDrawingInfo()
     }
     
     private func makeRandomColor() -> DrawingRGB {

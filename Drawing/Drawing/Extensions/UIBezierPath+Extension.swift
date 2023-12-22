@@ -7,17 +7,13 @@
 
 import UIKit
 
-protocol UIBezierPathProtocol {
-    var accessibilityLabel: String? { get set }
-    var bounds: CGRect { get }
-    var cgPath: CGPath { get }
+protocol BezierPathProtocol {
     func move(to point: DrawPoint)
     func addLine(to point: DrawPoint)
-    func apply(_ transform: CGAffineTransform)
+    func makeDrawingInfo() -> DrawingInfo
 }
 
-extension UIBezierPath: UIBezierPathProtocol {
-
+extension UIBezierPath {
     func move(to point: DrawPoint) {
         move(to: CGPoint(x: CGFloat(point.x), y: CGFloat(point.y)))
     }
